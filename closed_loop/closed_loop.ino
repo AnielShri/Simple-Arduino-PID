@@ -19,17 +19,17 @@ const byte ENABLE_PIN = A5;
 const int ENCODER_INTERVAL = 33;
 const int ENABLE_INTERVAL = 1000;
 const int SERIAL_INTERVAL = 100;
-const int PID_INTERVAL = 100;
+const int PID_INTERVAL = 50;
 
 /* normalize encoder count to rotation speed */
 const float ENCODER_RATIO = ((1000 / ENCODER_INTERVAL) / 10) * 1.8;	// 56Hz -> 100%
 
 /* PID controller configurations */
 const float SET_POINT = 100.0;						// setpoint = 100%
-const float PID_DT = (float)PID_INTERVAL / 1000;	// ms -> seconds
+const float PID_DT = (float)PID_INTERVAL / 1000.0;	// ms -> seconds
 
-const float Kp = 0.5;
-const float Ki = 1.75;		
+const float Kp = 1;
+const float Ki = 2;		
 const float Kd = 0.05;
 
 //	----------------------------------------------------------------------------+
@@ -127,9 +127,9 @@ void loop()
 
 		if (enable_state == 1)
 		{
-//			Serial.print(pid_output, DEC);
+//			Serial.print(pid_output, 2);
 //			Serial.print("\t");
-			Serial.println(enc_avg, DEC);
+			Serial.println(enc_avg, 2);
 		}
 	}
 
