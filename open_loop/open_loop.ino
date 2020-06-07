@@ -84,9 +84,9 @@ void loop()
 	else if (now >= serial_prev_time + SERIAL_INTERVAL)
 	{
 		serial_prev_time = now;		
-		Serial.print(enc_freq, DEC);		
+		Serial.print(enc_freq, 2);		
 		Serial.print("\t");		
-		Serial.println(enc_avg, DEC);
+		Serial.println(enc_avg, 2);
 	}
 
 	/* motor ON/OFF */
