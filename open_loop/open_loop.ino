@@ -26,10 +26,9 @@ unsigned long encoder_prev_time;
 unsigned long analog_prev_time;
 unsigned long enable_prev_time;
 unsigned long serial_prev_time;
-unsigned long pid_prev_time;
 
 /* encoder variables */
-unsigned int enc_count;
+volatile int enc_count;
 float enc_freq;
 float enc_avg;
 float enc_window[3];
