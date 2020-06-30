@@ -18,19 +18,19 @@ const byte ENABLE_PIN = A5;
 /* interval configurations */
 const int ENCODER_INTERVAL = 33;
 const int ENABLE_INTERVAL = 1000;
-const int SERIAL_INTERVAL = 100;
-const int PID_INTERVAL = 50;
+const int SERIAL_INTERVAL = 50;
+const int PID_INTERVAL = 10;
 
 /* normalize encoder count to rotation speed */
 const float ENCODER_RATIO = ((1000 / ENCODER_INTERVAL) / 10) * 1.8;	// 56Hz -> 100%
 
 /* PID controller configurations */
 const float SET_POINT = 100.0;						// setpoint = 100%
-const float PID_DT = (float)PID_INTERVAL / 1000.0;	// ms -> seconds
+const float PID_DT = PID_INTERVAL / 1000.0;	// ms -> seconds
 
-const float Kp = 1;
-const float Ki = 2;		
-const float Kd = 0.05;
+const float Kp = 5;
+const float Ki = 10;		
+const float Kd = 0.1;
 
 //	----------------------------------------------------------------------------+
 //	variables
@@ -43,7 +43,7 @@ unsigned long serial_prev_time;
 unsigned long pid_prev_time;
 
 /* encoder variables */
-unsigned int enc_count;
+volatile int enc_count;
 float enc_freq;
 float enc_avg;
 float enc_window[3];
@@ -107,7 +107,7 @@ void loop()
 		float error = SET_POINT - enc_avg;
 
 		error_integral += error * PID_DT;
-		if(error_integral > 255) error_integral = 255;
+		if(error_integral > 255) error_integral = 255; /* anti-windup */
 
 		float error_dt = (error - error_prev) / PID_DT;
 		error_prev = error;
@@ -137,19 +137,26 @@ void loop()
 	else if (now >= enable_prev_time + ENABLE_INTERVAL)
 	{
 		enable_prev_time = now;
+
+		/* reset stored PID values if enable_state = 0 */
+		/* => avoids massive increase of error_intergral */
+		/* -> allows step response with initial state = 0 */		
+		if (enable_state == 0)
+		{			
+			error_integral = 0;
+			error_prev = 0;
+		}		
 		
 		int val = analogRead(ENABLE_PIN);
 		if (val >= 1000)
 		{
+			
 			enable_state = 1;
 		}
 		else
 		{
 			enable_state = 0;
 
-			/* reset stored PID values */
-			error_integral = 0;
-			error_prev = 0;
 		}
 	}
 	
